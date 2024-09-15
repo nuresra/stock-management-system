@@ -37,7 +37,7 @@
                     HttpContext.Session.SetString("Username", user.Username);
 
                     // Satış ekranına yönlendirme
-                    return RedirectToAction("Index", "Sales");
+                    return RedirectToAction("Create", "Sales");
                 }
                 else
                 {

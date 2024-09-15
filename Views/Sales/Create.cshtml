@@ -1,14 +1,103 @@
 ﻿@model StockManagementSystem.ViewModels.SaleViewModel
+@{
+    ViewData["Title"] = "Satış Ekranı";
+}
 
-<h2>Yeni Satış Ekle</h2>
-<form asp-action="Create">
-    <div>
-        <label for="ProductId">Ürün Seç:</label>
-        <select asp-for="ProductId" asp-items="@(new SelectList(Model.Products, "Id", "Name"))"></select>
-    </div>
-    <div>
-        <label for="Quantity">Miktar:</label>
-        <input asp-for="Quantity" type="number" />
-    </div>
-    <button type="submit">Satışı Tamamla</button>
-</form>
+<div class="container mt-5">
+    <h2>Satış Ekranı</h2>
+
+    <form id="saleForm" asp-action="Create" method="post">
+        <div id="productList">
+            <!-- Ürünler burada dinamik olarak eklenecek -->
+        </div>
+
+        <div class="mt-4">
+            <label for="barcodeInput">Barkod:</label>
+            <input type="text" id="barcodeInput" class="form-control" placeholder="Barkod girin" />
+        </div>
+
+        <!-- Toplam fiyat alanı -->
+        <div class="mt-4">
+            <h4>Genel Toplam: <span id="grandTotal" class="text-success font-weight-bold">0.00</span> ₺</h4>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Satış Yap</button>
+    </form>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    let productIndex = 0;
+    let grandTotal = 0;
+
+    // Barkod girişi olduğunda tetiklenir
+    $('#barcodeInput').on('keypress', function (e) {
+        if (e.which === 13) {  // Enter'a basıldıysa
+            e.preventDefault();
+            const barcode = $(this).val();
+            if (barcode) {
+                addProductRow(barcode);
+                $(this).val('');  // Barkod alanını temizle
+            }
+        }
+    });
+
+    function addProductRow(barcode) {
+        $.ajax({
+            url: '/Sales/GetProductByBarcode',  // Backend'den ürün bilgilerini getir
+            type: 'GET',
+            data: { barcode: barcode },
+            success: function (product) {
+                if (product) {
+                    const rowHtml = `
+                            <div class="form-group row" id="productRow_${productIndex}">
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control" value="${product.name}" readonly />
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="number" class="form-control quantityInput" data-price="${product.price}" value="1" min="1" />
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="text" class="form-control productPrice" value="${product.price.toFixed(2)}" readonly />
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="text" class="form-control totalPrice" value="${product.price.toFixed(2)}" readonly />
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button" class="btn btn-danger" onclick="removeProductRow(${productIndex})">Sil</button>
+                                </div>
+                            </div>`;
+                    $('#productList').append(rowHtml);
+                    updateGrandTotal();  // Genel toplamı güncelle
+                    productIndex++;
+                } else {
+                    alert('Ürün bulunamadı!');
+                }
+            }
+        });
+    }
+
+    // Ürün satırını kaldır
+    function removeProductRow(index) {
+        $(`#productRow_${index}`).remove();
+        updateGrandTotal();  // Genel toplamı güncelle
+    }
+
+    // Miktar değiştiğinde fiyatları güncelle
+    $('#productList').on('input', '.quantityInput', function () {
+        const quantity = $(this).val();
+        const price = $(this).data('price');
+        const total = quantity * price;
+        $(this).closest('.row').find('.totalPrice').val(total.toFixed(2));
+        updateGrandTotal();  // Genel toplamı güncelle
+    });
+
+    // Genel toplamı güncelle
+    function updateGrandTotal() {
+        let total = 0;
+        $('.totalPrice').each(function () {
+            total += parseFloat($(this).val());
+        });
+        $('#grandTotal').text(total.toFixed(2));
+    }
+</script>

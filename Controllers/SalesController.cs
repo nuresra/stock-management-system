@@ -50,7 +50,7 @@ namespace StockManagementSystem.Controllers
                     };
                     _context.Sales.Add(sale);
                     _context.SaveChanges();
-                    return RedirectToAction("Index");
+                    return RedirectToAction("AddSale");
                 }
                 else
                 {
@@ -62,5 +62,21 @@ namespace StockManagementSystem.Controllers
             model.Products = _context.Products.ToList();
             return View(model);
         }
+
+        // GET: Barkod ile ürün bilgilerini getir
+        public IActionResult GetProductByBarcode(string barcode)
+        {
+            var product = _context.Products.SingleOrDefault(p => p.Barcode == barcode);
+            if (product != null)
+            {
+                return Json(new
+                {
+                    name = product.Name,
+                    price = product.Price
+                });
+            }
+            return Json(null);
+        }
+
     }
 }
