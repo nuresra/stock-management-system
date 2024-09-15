@@ -1,0 +1,27 @@
+﻿@model IEnumerable<Sale>
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Satış Listesi</h2>
+
+    <table class="table table-striped table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th>Ürün</th>
+                <th>Miktar</th>
+                <th>Toplam Fiyat</th>
+                <th>Satış Tarihi</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var sale in Model)
+            {
+                <tr>
+                    <td>@sale.Product.Name</td>
+                    <td>@sale.Quantity</td>
+                    <td>@sale.TotalPrice.ToString("C")</td>
+                    <td>@sale.SaleDate.ToShortDateString()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

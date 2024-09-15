@@ -1,0 +1,37 @@
+﻿@model StockManagementSystem.Models.Product
+
+<div class="container mt-5">
+    <h2>Yeni Ürün Ekle</h2>
+
+    <form asp-action="NewProductForm" method="post">
+        <div class="mb-3">
+            <label for="Barcode" class="form-label">Barkod</label>
+            <input asp-for="Barcode" class="form-control" placeholder="Barkod giriniz" />
+            <span asp-validation-for="Barcode" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label for="Name" class="form-label">Ürün Adı</label>
+            <input asp-for="Name" class="form-control" placeholder="Ürün adı giriniz" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label for="Price" class="form-label">Fiyat</label>
+            <input asp-for="Price" class="form-control" placeholder="Ürün fiyatı giriniz" />
+            <span asp-validation-for="Price" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label for="StockQuantity" class="form-label">Stok Miktarı</label>
+            <input asp-for="StockQuantity" class="form-control" placeholder="Stok miktarı giriniz" />
+            <span asp-validation-for="StockQuantity" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Ekle</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

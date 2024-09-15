@@ -1,0 +1,17 @@
+﻿@model StockManagementSystem.ViewModels.SaleViewModel
+
+<form asp-action="AddSale" method="post">
+    <div>
+        <label for="ProductId">Ürün ID:</label>
+        <input asp-for="ProductId" />
+    </div>
+    <div>
+        <label for="Quantity">Adet:</label>
+        <input asp-for="Quantity" />
+    </div>
+    <div>
+        <label for="TotalPrice">Toplam Fiyat:</label>
+        <input asp-for="TotalPrice" readonly /> <!-- Toplam fiyat otomatik hesaplanacak -->
+    </div>
+    <button type="submit">Satış Yap</button>
+</form>

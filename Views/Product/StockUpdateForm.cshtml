@@ -1,0 +1,13 @@
+﻿@page
+@model StockManagementSystem.Models.Product
+
+<h2>Stok Güncelle</h2>
+
+<form asp-action="UpdateStock" method="post">
+    <input type="hidden" asp-for="Id" />
+    <div>
+        <label for="StockQuantity">Eklenecek Stok Miktarı:</label>
+        <input type="number" name="stockIncrement" />
+    </div>
+    <button type="submit">Güncelle</button>
+</form>
