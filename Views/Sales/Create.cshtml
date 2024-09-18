@@ -13,7 +13,7 @@
 
         <div class="mt-4">
             <label for="barcodeInput">Barkod:</label>
-            <input type="text" id="barcodeInput" class="form-control" placeholder="Barkod girin" />
+            <input type="text" id="barcodeInput" class="form-control" maxlength="13" placeholder="Barkod girin" />
         </div>
 
         <!-- Toplam fiyat alanı -->
@@ -31,16 +31,31 @@
     let grandTotal = 0;
 
     // Barkod girişi olduğunda tetiklenir
-    $('#barcodeInput').on('keypress', function (e) {
-        if (e.which === 13) {  // Enter'a basıldıysa
-            e.preventDefault();
-            const barcode = $(this).val();
-            if (barcode) {
-                addProductRow(barcode);
-                $(this).val('');  // Barkod alanını temizle
-            }
+    $('#barcodeInput').on('input', function () {
+        const barcode = $(this).val();
+        if (barcode.length === 13) {  // Barkod 13 haneli ise
+            processBarcode(barcode);
+            $(this).val('');  // Barkod alanını temizle
         }
     });
+
+    function processBarcode(barcode) {
+        // Aynı barkoddan varsa kontrol et
+        const existingRow = $(`.productRow[data-barcode="${barcode}"]`);
+        if (existingRow.length > 0) {
+            // Mevcut satırın miktarını ve toplam fiyatını güncelle
+            const quantityInput = existingRow.find('.quantityInput');
+            let quantity = parseInt(quantityInput.val()) + 1;
+            const price = parseFloat(quantityInput.data('price'));
+            const total = quantity * price;
+            quantityInput.val(quantity);
+            existingRow.find('.totalPrice').val(total.toFixed(2));
+        } else {
+            // Ürün daha önce eklenmemişse yeni satır ekle
+            addProductRow(barcode);
+        }
+        updateGrandTotal();  // Genel toplamı güncelle
+    }
 
     function addProductRow(barcode) {
         $.ajax({
@@ -50,7 +65,7 @@
             success: function (product) {
                 if (product) {
                     const rowHtml = `
-                            <div class="form-group row" id="productRow_${productIndex}">
+                            <div class="form-group row productRow" data-barcode="${barcode}" id="productRow_${productIndex}">
                                 <div class="col-md-3">
                                     <input type="text" class="form-control" value="${product.name}" readonly />
                                 </div>
@@ -68,7 +83,6 @@
                                 </div>
                             </div>`;
                     $('#productList').append(rowHtml);
-                    updateGrandTotal();  // Genel toplamı güncelle
                     productIndex++;
                 } else {
                     alert('Ürün bulunamadı!');
