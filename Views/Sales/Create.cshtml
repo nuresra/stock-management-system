@@ -97,7 +97,22 @@
 
     // Ürün satırını kaldır
     function removeProductRow(index) {
-        $(`#productRow_${index}`).remove();
+        const row = $(`#productRow_${index}`);
+        const quantityInput = row.find('.quantityInput');
+        let quantity = parseInt(quantityInput.val());
+
+        if (quantity > 1) {
+            // Adeti 1 azalt
+            quantity--;
+            const price = parseFloat(quantityInput.data('price'));
+            const total = quantity * price;
+            quantityInput.val(quantity);
+            row.find('.totalPrice').val(total.toFixed(2));
+        } else {
+            // Adet 1 ise satırı tamamen kaldır
+            row.remove();
+        }
+
         updateGrandTotal();  // Genel toplamı güncelle
     }
 
