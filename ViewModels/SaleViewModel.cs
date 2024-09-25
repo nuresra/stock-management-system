@@ -1,14 +1,14 @@
-﻿using StockManagementSystem.Models;
+﻿using System.Collections.Generic;
+using StockManagementSystem.Models;
 
 namespace StockManagementSystem.ViewModels
 {
     public class SaleViewModel
     {
-        public int ProductId { get; set; }
-        public int Quantity { get; set; }
-        public decimal TotalPrice { get; set; }
-        public DateTime SaleDate { get; set; }
-        public IEnumerable<Product> Products { get; set; }
+        public List<Product> Products { get; set; }
+        public int ProductId { get; set; } // Ürün ID'si
+        public int Quantity { get; set; } // Miktar
+        public decimal TotalPrice { get; set; } // Toplam Fiyat
+        public List<SaleItem> SaleItems { get; set; } = new List<SaleItem>();
     }
-
 }

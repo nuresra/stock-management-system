@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace StockManagementSystem.Models
 {
@@ -6,15 +8,9 @@ namespace StockManagementSystem.Models
     {
         public int Id { get; set; }
 
-        [Required] // Satışta ürünün olması zorunlu
-        public int ProductId { get; set; }
+        public DateTime SaleDate { get; set; } = DateTime.Now;
 
-        [Required] // Her satış bir ürüne ait olmalı
-        public Product Product { get; set; }
-
-        public int Quantity { get; set; }
-        public decimal TotalPrice { get; set; }
-        public DateTime SaleDate { get; set; }
+        // Bir satış birden fazla ürün içerebilir (çoktan çoğa ilişki)
+        public ICollection<SaleItem> SaleItems { get; set; }
     }
-
 }

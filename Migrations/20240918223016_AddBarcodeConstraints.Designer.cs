@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StockManagementSystem.Models;
 
@@ -10,9 +11,11 @@ using StockManagementSystem.Models;
 namespace StockManagementSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240918223016_AddBarcodeConstraints")]
+    partial class AddBarcodeConstraints
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
@@ -78,36 +81,23 @@ namespace StockManagementSystem.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("SaleDate")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Sales");
-                });
-
-            modelBuilder.Entity("StockManagementSystem.Models.SaleItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("ProductId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("SaleId")
-                        .HasColumnType("INTEGER");
+                    b.Property<DateTime>("SaleDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId");
 
-                    b.HasIndex("SaleId");
-
-                    b.ToTable("SaleItem");
+                    b.ToTable("Sales");
                 });
 
             modelBuilder.Entity("StockManagementSystem.Models.Transaction", b =>
@@ -174,23 +164,15 @@ namespace StockManagementSystem.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("StockManagementSystem.Models.SaleItem", b =>
+            modelBuilder.Entity("StockManagementSystem.Models.Sale", b =>
                 {
                     b.HasOne("StockManagementSystem.Models.Product", "Product")
-                        .WithMany("SaleItems")
+                        .WithMany("Sales")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("StockManagementSystem.Models.Sale", "Sale")
-                        .WithMany("SaleItems")
-                        .HasForeignKey("SaleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Product");
-
-                    b.Navigation("Sale");
                 });
 
             modelBuilder.Entity("StockManagementSystem.Models.Transaction", b =>
@@ -206,12 +188,7 @@ namespace StockManagementSystem.Migrations
 
             modelBuilder.Entity("StockManagementSystem.Models.Product", b =>
                 {
-                    b.Navigation("SaleItems");
-                });
-
-            modelBuilder.Entity("StockManagementSystem.Models.Sale", b =>
-                {
-                    b.Navigation("SaleItems");
+                    b.Navigation("Sales");
                 });
 #pragma warning restore 612, 618
         }

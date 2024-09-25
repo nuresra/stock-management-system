@@ -3,13 +3,12 @@ using Microsoft.EntityFrameworkCore;
 using StockManagementSystem.Models;
 using StockManagementSystem.ViewModels;
 
-
 namespace StockManagementSystem.Controllers
 {
     public class SalesController : Controller
     {
         private readonly ApplicationDbContext _context;
-        
+
         public SalesController(ApplicationDbContext context)
         {
             _context = context;
@@ -17,7 +16,10 @@ namespace StockManagementSystem.Controllers
 
         public IActionResult Index()
         {
-            var sales = _context.Sales.Include(s => s.Product).ToList();
+            var sales = _context.Sales
+                .Include(s => s.SaleItems)
+                .ThenInclude(si => si.Product)
+                .ToList();
             return View(sales);
         }
 
@@ -31,30 +33,45 @@ namespace StockManagementSystem.Controllers
             return View(model); // Create.cshtml dosyasına model gönderiyoruz
         }
 
-        // POST: Yeni satış ekleme
         [HttpPost]
         public IActionResult Create(SaleViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var product = _context.Products.SingleOrDefault(p => p.Id == model.ProductId);
-                if (product != null && product.StockQuantity >= model.Quantity)
+                var sale = new Sale
                 {
-                    product.StockQuantity -= model.Quantity;
-                    var sale = new Sale
-                    {
-                        ProductId = model.ProductId,
-                        Quantity = model.Quantity,
-                        TotalPrice = product.Price * model.Quantity,
-                        SaleDate = DateTime.Now
-                    };
+                    SaleDate = DateTime.Now,
+                    SaleItems = model.SaleItems
+                        .Select(si =>
+                        {
+                            var product = _context.Products.SingleOrDefault(p => p.Id == si.ProductId);
+                            if (product != null && product.StockQuantity >= si.Quantity)
+                            {
+                                product.StockQuantity -= si.Quantity;
+                                // TotalPrice doğrudan ayarlamıyoruz, hesaplanacak
+                                return new SaleItem
+                                {
+                                    ProductId = si.ProductId,
+                                    Quantity = si.Quantity,
+                                    // TotalPrice hesaplanacak
+                                    // Product.Price * Quantity ile toplam fiyatı hesapla
+                                };
+                            }
+                            else
+                            {
+                                ModelState.AddModelError(string.Empty, "Yeterli stok bulunmuyor.");
+                                return null;
+                            }
+                        })
+                        .Where(si => si != null)
+                        .ToList()
+                };
+
+                if (ModelState.IsValid)
+                {
                     _context.Sales.Add(sale);
                     _context.SaveChanges();
-                    return RedirectToAction("AddSale");
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Yeterli stok bulunmuyor.");
+                    return RedirectToAction("Index");
                 }
             }
 
@@ -77,6 +94,5 @@ namespace StockManagementSystem.Controllers
             }
             return Json(null);
         }
-
     }
 }

@@ -84,12 +84,16 @@
                             </div>`;
                     $('#productList').append(rowHtml);
                     productIndex++;
+
+                    // Ürün satırı eklendikten hemen sonra toplamı güncelle
+                    updateGrandTotal();
                 } else {
                     alert('Ürün bulunamadı!');
                 }
             }
         });
     }
+
 
     // Ürün satırını kaldır
     function removeProductRow(index) {
