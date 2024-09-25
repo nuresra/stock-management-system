@@ -1,9 +1,4 @@
-﻿@model StockManagementSystem.ViewModels.SaleViewModel
-@{
-    ViewData["Title"] = "Satış Ekranı";
-}
-
-<div class="container mt-5">
+﻿<div class="container mt-5">
     <h2>Satış Ekranı</h2>
 
     <form id="saleForm" asp-action="Create" method="post">
@@ -25,6 +20,13 @@
     </form>
 </div>
 
+<style>
+    /* Ürün satırları arasında boşluk bırak */
+    .productRow {
+        margin-bottom: 10px;
+    }
+</style>
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
     let productIndex = 0;
@@ -40,10 +42,8 @@
     });
 
     function processBarcode(barcode) {
-        // Aynı barkoddan varsa kontrol et
         const existingRow = $(`.productRow[data-barcode="${barcode}"]`);
         if (existingRow.length > 0) {
-            // Mevcut satırın miktarını ve toplam fiyatını güncelle
             const quantityInput = existingRow.find('.quantityInput');
             let quantity = parseInt(quantityInput.val()) + 1;
             const price = parseFloat(quantityInput.data('price'));
@@ -51,42 +51,40 @@
             quantityInput.val(quantity);
             existingRow.find('.totalPrice').val(total.toFixed(2));
         } else {
-            // Ürün daha önce eklenmemişse yeni satır ekle
             addProductRow(barcode);
         }
-        updateGrandTotal();  // Genel toplamı güncelle
+        updateGrandTotal();
     }
 
     function addProductRow(barcode) {
         $.ajax({
-            url: '/Sales/GetProductByBarcode',  // Backend'den ürün bilgilerini getir
+            url: '/Sales/GetProductByBarcode',
             type: 'GET',
             data: { barcode: barcode },
             success: function (product) {
                 if (product) {
                     const rowHtml = `
-                            <div class="form-group row productRow" data-barcode="${barcode}" id="productRow_${productIndex}">
-                                <div class="col-md-3">
-                                    <input type="text" class="form-control" value="${product.name}" readonly />
-                                </div>
-                                <div class="col-md-2">
-                                    <input type="number" class="form-control quantityInput" data-price="${product.price}" value="1" min="1" />
-                                </div>
-                                <div class="col-md-2">
-                                    <input type="text" class="form-control productPrice" value="${product.price.toFixed(2)}" readonly />
-                                </div>
-                                <div class="col-md-2">
-                                    <input type="text" class="form-control totalPrice" value="${product.price.toFixed(2)}" readonly />
-                                </div>
-                                <div class="col-md-2">
-                                    <button type="button" class="btn btn-danger" onclick="removeProductRow(${productIndex})">Sil</button>
-                                </div>
-                            </div>`;
+                        <div class="form-group row productRow" data-barcode="${barcode}" id="productRow_${productIndex}">
+                            <div class="col-md-3">
+                                    <input type="text" class="form-control" value="${product.name.toUpperCase()}" readonly />
+                            </div>
+                            <div class="col-md-2">
+                                <input type="number" class="form-control quantityInput" data-price="${product.price}" value="1" min="1" />
+                            </div>
+                            <div class="col-md-2">
+                                <input type="text" class="form-control productPrice" value="${product.price.toFixed(2)}" readonly />
+                            </div>
+                            <div class="col-md-2">
+                                <input type="text" class="form-control totalPrice" value="${product.price.toFixed(2)}" readonly />
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-danger" onclick="removeProductRow(${productIndex})">Sil</button>
+                            </div>
+                        </div>`;
                     $('#productList').append(rowHtml);
                     productIndex++;
-
-                    // Ürün satırı eklendikten hemen sonra toplamı güncelle
                     updateGrandTotal();
+
                 } else {
                     alert('Ürün bulunamadı!');
                 }
@@ -94,38 +92,31 @@
         });
     }
 
-
-    // Ürün satırını kaldır
     function removeProductRow(index) {
         const row = $(`#productRow_${index}`);
         const quantityInput = row.find('.quantityInput');
         let quantity = parseInt(quantityInput.val());
 
         if (quantity > 1) {
-            // Adeti 1 azalt
             quantity--;
             const price = parseFloat(quantityInput.data('price'));
             const total = quantity * price;
             quantityInput.val(quantity);
             row.find('.totalPrice').val(total.toFixed(2));
         } else {
-            // Adet 1 ise satırı tamamen kaldır
             row.remove();
         }
-
-        updateGrandTotal();  // Genel toplamı güncelle
+        updateGrandTotal();
     }
 
-    // Miktar değiştiğinde fiyatları güncelle
     $('#productList').on('input', '.quantityInput', function () {
         const quantity = $(this).val();
         const price = $(this).data('price');
         const total = quantity * price;
         $(this).closest('.row').find('.totalPrice').val(total.toFixed(2));
-        updateGrandTotal();  // Genel toplamı güncelle
+        updateGrandTotal();
     });
 
-    // Genel toplamı güncelle
     function updateGrandTotal() {
         let total = 0;
         $('.totalPrice').each(function () {
