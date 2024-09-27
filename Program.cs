@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using StockManagementSystem.Models;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +20,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 
 var app = builder.Build();
+var supportedCultures = new[] { new CultureInfo("tr-TR") };
+var localizationOptions = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture("tr-TR"), // Default culture
+    SupportedCultures = supportedCultures,               // Supported cultures for formatting
+    SupportedUICultures = supportedCultures               // Supported cultures for UI formatting
+};
+app.UseRequestLocalization(localizationOptions);
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
