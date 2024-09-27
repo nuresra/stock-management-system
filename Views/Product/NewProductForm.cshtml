@@ -18,7 +18,7 @@
 
         <div class="mb-3">
             <label for="Price" class="form-label">Fiyat</label>
-            <input asp-for="Price" class="form-control" placeholder="Ürün fiyatı giriniz" />
+            <input asp-for="Price" class="form-control" type="number" placeholder="Ürün fiyatı giriniz" step="0.01" />
             <span asp-validation-for="Price" class="text-danger"></span>
         </div>
 
