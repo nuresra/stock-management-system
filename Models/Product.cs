@@ -17,7 +17,8 @@ namespace StockManagementSystem.Models
 
         public int StockQuantity { get; set; }
 
-        public ICollection<SaleItem> SaleItems { get; set; }
+
+        public ICollection<SaleItem>? SaleItems { get; set; } // null olabilir
 
 
     }

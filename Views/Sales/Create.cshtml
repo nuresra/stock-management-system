@@ -33,11 +33,14 @@
     let grandTotal = 0;
 
     // Barkod girişi olduğunda tetiklenir
-    $('#barcodeInput').on('input', function () {
-        const barcode = $(this).val();
-        if (barcode.length === 13) {  // Barkod 13 haneli ise
-            processBarcode(barcode);
-            $(this).val('');  // Barkod alanını temizle
+    $('#barcodeInput').on('keydown', function (event) {
+        if (event.key === 'Enter') {  // Enter tuşuna basıldığında
+            event.preventDefault();  // Formun varsayılan gönderim davranışını engelle
+            const barcode = $(this).val();
+            if (barcode.length === 13) {  // Barkod 13 haneli ise
+                processBarcode(barcode);
+                $(this).val('');  // Barkod alanını temizle
+            }
         }
     });
 
