@@ -12,19 +12,30 @@ namespace StockManagementSystem.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Products",
+                name: "Category",
+                columns: table => new
+                {
+                    CategoryID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    CategoryName = table.Column<string>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Category", x => x.CategoryID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Sales",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Barcode = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Price = table.Column<decimal>(type: "TEXT", nullable: false),
-                    StockQuantity = table.Column<int>(type: "INTEGER", nullable: false)
+                    SaleDate = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Products", x => x.Id);
+                    table.PrimaryKey("PK_Sales", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -39,6 +50,31 @@ namespace StockManagementSystem.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Products",
+                columns: table => new
+                {
+                    ProductID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Barcode = table.Column<string>(type: "TEXT", maxLength: 13, nullable: false),
+                    ProductName = table.Column<string>(type: "TEXT", nullable: false),
+                    Price = table.Column<decimal>(type: "TEXT", nullable: false),
+                    StockQuantity = table.Column<int>(type: "INTEGER", nullable: false),
+                    CategoryID = table.Column<int>(type: "INTEGER", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Products", x => x.ProductID);
+                    table.ForeignKey(
+                        name: "FK_Products_Category_CategoryID",
+                        column: x => x.CategoryID,
+                        principalTable: "Category",
+                        principalColumn: "CategoryID",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -59,28 +95,33 @@ namespace StockManagementSystem.Migrations
                         name: "FK_Debts_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
-                        principalColumn: "Id",
+                        principalColumn: "ProductID",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Sales",
+                name: "SaleItem",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    SaleId = table.Column<int>(type: "INTEGER", nullable: false),
                     ProductId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Quantity = table.Column<int>(type: "INTEGER", nullable: false),
-                    TotalPrice = table.Column<decimal>(type: "TEXT", nullable: false),
-                    SaleDate = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    Quantity = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Sales", x => x.Id);
+                    table.PrimaryKey("PK_SaleItem", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Sales_Products_ProductId",
+                        name: "FK_SaleItem_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
+                        principalColumn: "ProductID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_SaleItem_Sales_SaleId",
+                        column: x => x.SaleId,
+                        principalTable: "Sales",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -103,9 +144,14 @@ namespace StockManagementSystem.Migrations
                         name: "FK_Transactions_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
-                        principalColumn: "Id",
+                        principalColumn: "ProductID",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "Password", "Username" },
+                values: new object[] { 1, "12345", "admin" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Debts_ProductId",
@@ -113,9 +159,25 @@ namespace StockManagementSystem.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Sales_ProductId",
-                table: "Sales",
+                name: "IX_Products_Barcode",
+                table: "Products",
+                column: "Barcode",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_CategoryID",
+                table: "Products",
+                column: "CategoryID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SaleItem_ProductId",
+                table: "SaleItem",
                 column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SaleItem_SaleId",
+                table: "SaleItem",
+                column: "SaleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Transactions_ProductId",
@@ -130,7 +192,7 @@ namespace StockManagementSystem.Migrations
                 name: "Debts");
 
             migrationBuilder.DropTable(
-                name: "Sales");
+                name: "SaleItem");
 
             migrationBuilder.DropTable(
                 name: "Transactions");
@@ -139,7 +201,13 @@ namespace StockManagementSystem.Migrations
                 name: "Users");
 
             migrationBuilder.DropTable(
+                name: "Sales");
+
+            migrationBuilder.DropTable(
                 name: "Products");
+
+            migrationBuilder.DropTable(
+                name: "Category");
         }
     }
 }

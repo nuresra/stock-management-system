@@ -1,0 +1,26 @@
+﻿@model StockManagementSystem.Models.Category
+
+<div class="container mt-5">
+    <h2>Yeni Kategori Ekle</h2>
+
+    <form asp-action="NewCategoryForm" method="post">
+        <div class="mb-6">
+            <label for="CategoryName" class="form-label">Kategori Adı</label>
+            <input asp-for="CategoryName" class="form-control" placeholder="Kategori Adı Giriniz" />
+            <span asp-validation-for="CategoryName" class="text-danger"></span>
+        </div>
+
+        <div class="mb-6">
+            <label for="Description" class="form-label">Kategori Açıklaması</label>
+            <input asp-for="Description" class="form-control" placeholder="Kategori Açıklaması Giriniz." />
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+
+        <button type="submit" class="btn btn-primary">Ekle</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

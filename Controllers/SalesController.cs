@@ -44,7 +44,7 @@ namespace StockManagementSystem.Controllers
                     SaleItems = model.SaleItems
                         .Select(si =>
                         {
-                            var product = _context.Products.SingleOrDefault(p => p.Id == si.ProductId);
+                            var product = _context.Products.SingleOrDefault(p => p.ProductID == si.ProductId);
                             if (product != null && product.StockQuantity >= si.Quantity)
                             {
                                 product.StockQuantity -= si.Quantity;
@@ -88,7 +88,7 @@ namespace StockManagementSystem.Controllers
             {
                 return Json(new
                 {
-                    name = product.Name,
+                    name = product.ProductName,
                     price = product.Price
                 });
             }

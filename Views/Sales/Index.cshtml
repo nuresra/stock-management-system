@@ -18,7 +18,7 @@
                 @foreach (var saleItem in sale.SaleItems)
                 {
                     <tr>
-                        <td>@saleItem.Product.Name</td>
+                        <td>@saleItem.Product.ProductName</td>
                         <td>@saleItem.Quantity</td>
                         <td>@saleItem.TotalPrice.ToString("C")</td>
                         <td>@sale.SaleDate.ToShortDateString()</td>

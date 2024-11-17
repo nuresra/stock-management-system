@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using StockManagementSystem.Models;
 using System.Linq;
 
@@ -24,6 +25,8 @@ namespace StockManagementSystem.Controllers
         public IActionResult NewProductForm()
         {
             var model = new Product();  // Boş bir model oluştur
+            var categories = _context.Categories.ToList(); // Kategorileri veritabanından al
+            ViewBag.Categories = new SelectList(categories, "CategoryID", "CategoryName"); // Kategorileri ViewBag'e ekle
             return View(model);
         }
 
@@ -31,29 +34,51 @@ namespace StockManagementSystem.Controllers
         [HttpPost]
         public IActionResult NewProductForm(Product model)
         {
+            if (model.CategoryID == 0)
+            {
+                ModelState.AddModelError("CategoryID", "Kategori seçilmesi zorunludur.");
+            }
+
             if (ModelState.IsValid)
             {
-                _context.Products.Add(model);
-                _context.SaveChanges();
-                return RedirectToAction("NewProductForm");
+                try
+                {
+                    Console.WriteLine("Seçili Kategori ID: " + model.CategoryID);
+                    model.Category = _context.Categories.SingleOrDefault(c => c.CategoryID == model.CategoryID);
+                    _context.Products.Add(model);
+                    _context.SaveChanges();
+                    return RedirectToAction("NewProductForm");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Seçili Kategori ID: " + model.CategoryID);
+                    // Konsolda hata mesajını görebilirsiniz.
+                    Console.WriteLine(ex.Message);
+                    ModelState.AddModelError("", "Veritabanına kayıt işlemi sırasında bir hata oluştu.");
+                }
             }
-            if (!ModelState.IsValid)
+            else
             {
+                Console.WriteLine("Seçili Kategori ID: " + model.CategoryID);
+                // Tüm hata mesajlarını konsolda göster
                 var errors = ModelState.Values.SelectMany(v => v.Errors);
                 foreach (var error in errors)
                 {
-                    Console.WriteLine(error.ErrorMessage);  // Konsolda hataları görebilirsiniz.
+                    Console.WriteLine($"Hata: {error.ErrorMessage}");
                 }
-                return View(model);
             }
-    
+
+            var categories = _context.Categories.ToList();
+            ViewBag.Categories = new SelectList(categories, "CategoryID", "CategoryName");
             return View(model);
         }
+
+
 
         // GET: Stok güncelleme
         public IActionResult UpdateStock(int id)
         {
-            var product = _context.Products.SingleOrDefault(p => p.Id == id);
+            var product = _context.Products.SingleOrDefault(p => p.ProductID == id);
             if (product == null)
             {
                 return NotFound();
@@ -65,7 +90,7 @@ namespace StockManagementSystem.Controllers
         [HttpPost]
         public IActionResult UpdateStock(int id, int stockIncrement)
         {
-            var product = _context.Products.SingleOrDefault(p => p.Id == id);
+            var product = _context.Products.SingleOrDefault(p => p.ProductID == id);
             if (product != null)
             {
                 product.StockQuantity += stockIncrement;

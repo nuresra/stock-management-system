@@ -11,7 +11,7 @@ using StockManagementSystem.Models;
 namespace StockManagementSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240905221756_InitialCreate")]
+    [Migration("20241013002317_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -19,6 +19,25 @@ namespace StockManagementSystem.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
+
+            modelBuilder.Entity("StockManagementSystem.Models.Category", b =>
+                {
+                    b.Property<int>("CategoryID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CategoryName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("CategoryID");
+
+                    b.ToTable("Category");
+                });
 
             modelBuilder.Entity("StockManagementSystem.Models.Debt", b =>
                 {
@@ -48,30 +67,59 @@ namespace StockManagementSystem.Migrations
 
             modelBuilder.Entity("StockManagementSystem.Models.Product", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("ProductID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Barcode")
                         .IsRequired()
+                        .HasMaxLength(13)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
+                    b.Property<int>("CategoryID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("StockQuantity")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("Id");
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ProductID");
+
+                    b.HasIndex("Barcode")
+                        .IsUnique();
+
+                    b.HasIndex("CategoryID");
 
                     b.ToTable("Products");
                 });
 
             modelBuilder.Entity("StockManagementSystem.Models.Sale", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("SaleDate")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Sales");
+                });
+
+            modelBuilder.Entity("StockManagementSystem.Models.SaleItem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -83,17 +131,16 @@ namespace StockManagementSystem.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("SaleDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<decimal>("TotalPrice")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("SaleId")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("Sales");
+                    b.HasIndex("SaleId");
+
+                    b.ToTable("SaleItem");
                 });
 
             modelBuilder.Entity("StockManagementSystem.Models.Transaction", b =>
@@ -139,6 +186,14 @@ namespace StockManagementSystem.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Password = "12345",
+                            Username = "admin"
+                        });
                 });
 
             modelBuilder.Entity("StockManagementSystem.Models.Debt", b =>
@@ -152,15 +207,34 @@ namespace StockManagementSystem.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("StockManagementSystem.Models.Sale", b =>
+            modelBuilder.Entity("StockManagementSystem.Models.Product", b =>
+                {
+                    b.HasOne("StockManagementSystem.Models.Category", "Category")
+                        .WithMany("Products")
+                        .HasForeignKey("CategoryID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("StockManagementSystem.Models.SaleItem", b =>
                 {
                     b.HasOne("StockManagementSystem.Models.Product", "Product")
-                        .WithMany()
+                        .WithMany("SaleItems")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("StockManagementSystem.Models.Sale", "Sale")
+                        .WithMany("SaleItems")
+                        .HasForeignKey("SaleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Product");
+
+                    b.Navigation("Sale");
                 });
 
             modelBuilder.Entity("StockManagementSystem.Models.Transaction", b =>
@@ -172,6 +246,21 @@ namespace StockManagementSystem.Migrations
                         .IsRequired();
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("StockManagementSystem.Models.Category", b =>
+                {
+                    b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("StockManagementSystem.Models.Product", b =>
+                {
+                    b.Navigation("SaleItems");
+                });
+
+            modelBuilder.Entity("StockManagementSystem.Models.Sale", b =>
+                {
+                    b.Navigation("SaleItems");
                 });
 #pragma warning restore 612, 618
         }

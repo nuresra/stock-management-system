@@ -6,30 +6,34 @@
     <form asp-action="NewProductForm" method="post">
         <div class="mb-3">
             <label for="Barcode" class="form-label">Barkod</label>
-            <input asp-for="Barcode" class="form-control" placeholder="Barkod giriniz" />
+            <input asp-for="Barcode" class="form-control" id="Barcode" placeholder="Barkod giriniz" />
             <span asp-validation-for="Barcode" class="text-danger"></span>
         </div>
-
         <div class="mb-3">
-            <label for="Name" class="form-label">Ürün Adı</label>
-            <input asp-for="Name" class="form-control" placeholder="Ürün adı giriniz" />
-            <span asp-validation-for="Name" class="text-danger"></span>
+            <label for="ProductName" class="form-label">Ürün Adı</label>
+            <input asp-for="ProductName" class="form-control" id="ProductName" placeholder="Ürün adı giriniz" />
+            <span asp-validation-for="ProductName" class="text-danger"></span>
         </div>
-
+        <div class="mb-3">
+            <label for="CategoryID" class="form-label">Kategori</label>
+            <select asp-for="CategoryID" class="form-select" id="CategoryID" asp-items="ViewBag.Categories" required>
+                <option value="0">Kategori Seçiniz</option>
+            </select>
+            <span asp-validation-for="CategoryID" class="text-danger"></span>
+        </div>
         <div class="mb-3">
             <label for="Price" class="form-label">Fiyat</label>
-            <input asp-for="Price" class="form-control" type="number" placeholder="Ürün fiyatı giriniz" step="0.01" />
+            <input asp-for="Price" class="form-control" id="Price" type="number" placeholder="Ürün fiyatı giriniz" step="0.01" />
             <span asp-validation-for="Price" class="text-danger"></span>
         </div>
-
         <div class="mb-3">
             <label for="StockQuantity" class="form-label">Stok Miktarı</label>
-            <input asp-for="StockQuantity" class="form-control" placeholder="Stok miktarı giriniz" />
+            <input asp-for="StockQuantity" class="form-control" id="StockQuantity" placeholder="Stok miktarı giriniz" />
             <span asp-validation-for="StockQuantity" class="text-danger"></span>
         </div>
-
         <button type="submit" class="btn btn-primary">Ekle</button>
     </form>
+
 </div>
 
 @section Scripts {

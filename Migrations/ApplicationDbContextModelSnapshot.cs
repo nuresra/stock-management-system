@@ -17,6 +17,26 @@ namespace StockManagementSystem.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
 
+            modelBuilder.Entity("StockManagementSystem.Models.Category", b =>
+                {
+                    b.Property<int>("CategoryID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CategoryName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("CategoryID");
+
+                    b.ToTable("Categories");
+                });
+
             modelBuilder.Entity("StockManagementSystem.Models.Debt", b =>
                 {
                     b.Property<int>("Id")
@@ -45,7 +65,7 @@ namespace StockManagementSystem.Migrations
 
             modelBuilder.Entity("StockManagementSystem.Models.Product", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("ProductID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -54,20 +74,31 @@ namespace StockManagementSystem.Migrations
                         .HasMaxLength(13)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
+                    b.Property<int>("CategoryID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("StockQuantity")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("Id");
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ProductID");
 
                     b.HasIndex("Barcode")
                         .IsUnique();
+
+                    b.HasIndex("CategoryID");
 
                     b.ToTable("Products");
                 });
@@ -158,7 +189,7 @@ namespace StockManagementSystem.Migrations
                         new
                         {
                             Id = 1,
-                            Password = "827CCB0EEA8A706C4C34A16891F84E7B",
+                            Password = "12345",
                             Username = "admin"
                         });
                 });
@@ -172,6 +203,17 @@ namespace StockManagementSystem.Migrations
                         .IsRequired();
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("StockManagementSystem.Models.Product", b =>
+                {
+                    b.HasOne("StockManagementSystem.Models.Category", "Category")
+                        .WithMany("Products")
+                        .HasForeignKey("CategoryID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("StockManagementSystem.Models.SaleItem", b =>
@@ -202,6 +244,11 @@ namespace StockManagementSystem.Migrations
                         .IsRequired();
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("StockManagementSystem.Models.Category", b =>
+                {
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("StockManagementSystem.Models.Product", b =>

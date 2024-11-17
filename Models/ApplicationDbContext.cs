@@ -25,7 +25,7 @@
                 {
                     Id = 1,
                     Username = "admin",
-                    Password = HashPassword("12345") // Şifreyi hashliyoruz
+                    Password = "12345" // Şifreyi hashliyoruz
                 }
             );
         }
@@ -47,9 +47,30 @@
                 return sb.ToString();
             }
         }
+        public override int SaveChanges()
+        {
+            var entries = ChangeTracker
+                .Entries()
+                .Where(e => e.Entity is Product &&
+                            (e.State == EntityState.Added || e.State == EntityState.Modified));
+
+            foreach (var entityEntry in entries)
+            {
+                ((Product)entityEntry.Entity).UpdatedAt = DateTime.Now;
+
+                if (entityEntry.State == EntityState.Added)
+                {
+                    ((Product)entityEntry.Entity).CreatedAt = DateTime.Now;
+                }
+            }
+
+            return base.SaveChanges();
+        }
+
 
         public DbSet<User> Users { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<Category> Categories { get; set; }
         public DbSet<Sale> Sales { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Debt> Debts { get; set; }
